@@ -1,0 +1,53 @@
+# Load the dataset
+url = 'https://www.kaggle.com/datasets/sobhanmoosavi/us-accidents'
+df = pd.read_csv(url)
+
+# Display the first few rows of the dataset
+df.head()Step 2: Inspect and clean the dataInspect the data to understand its structure and identify any missing values or anomalies.# Display basic information about the dataset
+df.info()
+
+# Display summary statistics
+df.describe()
+
+# Check for missing values
+missing_values = df.isnull().sum()
+print(missing_values)
+
+# Drop rows with significant missing values
+df.dropna(subset=['Start_Time', 'End_Time', 'Start_Lat', 'Start_Lng', 'Weather_Condition'], inplace=True)Step 3: Perform exploratory data analysis (EDA)Analyze patterns related to road conditions, weather, and time of day.Accidents by Time of Day# Convert the Start_Time column to datetime
+df['Start_Time'] = pd.to_datetime(df['Start_Time'])
+
+# Extract hour from Start_Time
+df['Hour'] = df['Start_Time'].dt.hour
+
+# Plot the number of accidents by hour of the day
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.figure(figsize=(10, 6))
+sns.countplot(x='Hour', data=df, palette='viridis')
+plt.title('Number of Accidents by Hour of the Day')
+plt.xlabel('Hour of the Day')
+plt.ylabel('Number of Accidents')
+plt.show()Accidents by Weather Condition# Plot the number of accidents by weather condition
+plt.figure(figsize=(12, 8))
+sns.countplot(y='Weather_Condition', data=df, order=df['Weather_Condition'].value_counts().index, palette='viridis')
+plt.title('Number of Accidents by Weather Condition')
+plt.xlabel('Number of Accidents')
+plt.ylabel('Weather Condition')
+plt.show()Accidents by Road Condition# Plot the number of accidents by road condition (assuming Road_Condition column exists)
+if 'Road_Condition' in df.columns:
+    plt.figure(figsize=(12, 8))
+    sns.countplot(y='Road_Condition', data=df, order=df['Road_Condition'].value_counts().index, palette='viridis')
+    plt.title('Number of Accidents by Road Condition')
+    plt.xlabel('Number of Accidents')
+    plt.ylabel('Road Condition')
+    plt.show()Step 4: Visualize accident hotspotsVisualize accident hotspots on a map.import folium
+from folium.plugins import HeatMap
+
+# Create a map centered around the United States
+accident_map = folium.Map(location=[37.0902, -95.7129], zoom_start=5)
+
+# Prepare data for heatmap
+heat_data = [[row['Start_Lat'], row['Start_Lng']] for index, row in df.iterrows()]
+
